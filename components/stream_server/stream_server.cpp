@@ -44,10 +44,15 @@ void StreamServerComponent::setup() {
     struct timeval timeout;      
     timeout.tv_sec = 0;
     timeout.tv_usec = 20000; // ESPHome recommends 20-30 ms max for timeouts
-    
+    #ifdef USE_ESP8266
+    this->socket_->setsockopt(SOL_SOCKET, LWIP_SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+    this->socket_->setsockopt(SOL_SOCKET, LWIP_SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+    #endif
+
+    #ifdef USE_ESP32
     this->socket_->setsockopt(SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
     this->socket_->setsockopt(SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
-  
+    #endif
     this->socket_->bind(reinterpret_cast<struct sockaddr *>(&bind_addr), sizeof(struct sockaddr_in));
     this->socket_->listen(8);
 
